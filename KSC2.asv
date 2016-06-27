@@ -82,8 +82,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
             self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?', '%s\n' ,'%s');
             self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?', '%s\n' ,'%s');
             self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?', '%s\n' ,'%s');
-            self.OverloadOutLimit{1} = str2double(query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s'));
-            self.OverloadOutLimit{2} = str2double(query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s'));
+            self.OverloadOutLim{1} = query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s');
+            self.OverloadOutLim{2} = query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s');
             
             if (self.Printable)
                 fprintf(['KSC-2: SN-', self.SN, ...
@@ -123,7 +123,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 if strcmp(verify, coupling)
                     self.isUpdated = true;
                     self.Coupling{channel} = coupling;
-                    self.isUpdated = true;
+%                     fprintf(['COUPLING FOR CHANNEL ', num2str(CH) ,' SET TO ', COUPLING, '\r']);
                 else
                     error(['COMMUNICATION ERROR: COUPLING', '\r'])
                 end
@@ -153,7 +153,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 if strcmp(verify, mode)
                     self.isUpdated = true;                        
                     self.OperationMode{channel} = mode;
-                    self.isUpdated = true;
+%                     fprintf(['MODE FOR CHANNEL ', num2str(CH) ,' SET TO ', MODE, '\r']);
                 else
                     error(['COMMUNICATION ERROR: SHIELD', '\r'])
                 end
@@ -180,7 +180,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
 
                 if str2double(verify) == FC_round
                     self.FrequencyCutoff{channel} = FC_round;
-                    self.isUpdated = true;
+%             fprintf(['FILTER CUTOFF FOR CHANNEL ', num2str(channel),...
+%                 ' SET TO ', num2str(FC_round), 'Hz', '\r']);
                 else
                     error(['COMMUNICATION ERROR: FC', '\r'])
                 end
@@ -193,7 +194,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 verify = (fscanf(self.comPORT, '%s'));
                 if strcmp(verify, type)
                     self.FilterType{channel} = type;
-                    self.isUpdated = true;
+%                     fprintf(['FILTER TYPE FOR CHANNEL ',...
+%                         num2str(channel) ,' SET TO ', type, '\r']);
                 else
                     error(['COMMUNICATION ERROR: FILTER TYPE', '\r'])
                 end
