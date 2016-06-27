@@ -141,7 +141,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
             if ~strcmp(self.OperationMode{channel}, mode)
                 fprintf(self.comPORT, [num2str(channel), ':MODE = ', mode]);
                 verify = (fscanf(self.comPORT, '%s'));
-                if strcmp(verify, mode)
+                if verify == mode
                     self.isUpdated = true;                        
                     self.OperationMode{channel} = mode;
 %                     fprintf(['MODE FOR CHANNEL ', num2str(CH) ,' SET TO ', MODE, '\r']);
