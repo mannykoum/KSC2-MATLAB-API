@@ -171,8 +171,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
 
                 if str2double(verify) == FC_round
                     self.FrequencyCutoff{channel} = FC_round;
-    %             fprintf(['FILTER CUTOFF FOR CHANNEL ', num2str(channel),...
-    %                 ' SET TO ', num2str(FC_round), 'Hz', '\r']);
+%             fprintf(['FILTER CUTOFF FOR CHANNEL ', num2str(channel),...
+%                 ' SET TO ', num2str(FC_round), 'Hz', '\r']);
                 else
                     error(['COMMUNICATION ERROR: FC', '\r'])
                 end
@@ -196,64 +196,51 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
         
         %% excitation KSC
         function excitation(self, channel, voltage, exc_type, sense)
-
-            %SET EXCITATION VOLTAGE
-            fprintf(self.comPORT, [num2str(channel), ':EXC = ',...
-                num2str(voltage)]);
-            verify = (fscanf(self.comPORT, '%s'));
+            
+            % set excitation voltage
+            % only change if different
             V_round = round(voltage/0.00125)*0.00125;
-            % if V<250
-            %     V_round = 500;
-            % end
+            if V_round ~= self.ExcitationVoltage{channel}
+                fprintf(self.comPORT, [num2str(channel), ':EXC = ',...
+                    num2str(voltage)]);
+                verify = (fscanf(self.comPORT, '%s'));
 
-            if str2double(verify) == V_round
-                self.ExcitationVoltage{channel} = V_round;
+                if str2double(verify) == V_round
+                    self.ExcitationVoltage{channel} = V_round;
 %                 fprintf(['EXCITATION VOLTAGE FOR CHANNEL ', num2str(channel) ,' SET TO ', num2str(V_round), 'V DC', '\r']);
-            else
-                error(['COMMUNICATION ERROR: EXC', '\r'])
+                else
+                    error(['COMMUNICATION ERROR: EXC', '\r'])
+                end
             end
 
-            %SET EXCITATION VOLTAGE TYPE
-            fprintf(self.comPORT, [num2str(channel), ':EXCTYPE = ',...
-                exc_type]);
-            verify = (fscanf(self.comPORT, '%s'));
-            if length(verify) == length(exc_type)    
-                if verify == exc_type
-                    self.ExcitationType = exc_type;
+            % set excitation voltage type
+            % only change if different
+            if ~strcmp(self.ExcitationType{channel}, exc_type)
+                fprintf(self.comPORT, [num2str(channel), ':EXCTYPE = ',...
+                    exc_type]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, exc_type)
+                    self.ExcitationType{channel} = exc_type;
 %                     fprintf(['EXCITATION TYPE FOR CHANNEL ', num2str(channel) ,' SET TO ', exc_type, '\r']);
                 else
                     error(['COMMUNICATION ERROR: EXCITATION TYPE', '\r'])
                 end
-            else
-                error(['COMMUNICATION ERROR: EXCITATION TYPE', '\r'])
             end
-
-            %SET SENSE
-            fprintf(self.comPORT, [num2str(channel), ':SENSE = ', sense]);
-            verify = (fscanf(self.comPORT, '%s'));
-            if length(verify) == length(sense)    
-                if verify == sense
-                    self.SenseMode = sense;
+                
+            % set sense mode
+            % only change is different
+            if ~strcmp(self.SenseMode{channel}, sense)
+                fprintf(self.comPORT, [num2str(channel), ':SENSE = ', sense]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, sense)
+                    self.SenseMode{channel} = sense;
 %                     fprintf(['SENSE MODE FOR CHANNEL ', num2str(channel) ,' SET TO ', sense, '\r']);
                 else
                     error(['COMMUNICATION ERROR: SENSE MODE', '\r'])
                 end
-            else
-                error(['COMMUNICATION ERROR: SENSE MODE', '\r'])
-
             end
         end
         
-%         %% setter methods
-%         function self = set.Coupling(self, coupling)
-%             if ~(iscell(coupling) && (length(coupling)==2))
-%                 error('Incorrect usage of set().')
-%             end
-%             if (isempty(channel))
-%                 self.Coupling = coupling;
-%             end
-%         end
-
 
         %% pregain KSC        
         function pregainKSC(self, channel, gain)
@@ -263,11 +250,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
         % channel: channel to be modified
         % gain: the value for the pregain
         
-            %SET GAIN
-            fprintf(self.comPORT, [num2str(channel), ':PREGAIN = ',...
-                num2str(gain)]);
-            verify = (fscanf(self.comPORT, '%s'));
-
+            % set gain
+            % only change if different
             n = nextpow2(gain);
             hi = 2^n;
             lo = 2^(n-1);
@@ -280,17 +264,68 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
             if gain>128
                 GAIN_round = 128;
             end
+            
+            if (abs(self.Pregain{channel}-GAIN_round)>0.001)
+                fprintf(self.comPORT, [num2str(channel), ':PREGAIN = ',...
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, '%s'));
 
-
-            if (abs(str2double(verify)- GAIN_round) < 0.001)
-                self.Pregain{channel} = GAIN_round;
+                if (abs(str2double(verify)- GAIN_round) < 0.001)
+                    self.Pregain{channel} = GAIN_round;
 %             fprintf(['PREGAIN FOR CHANNEL ', num2str(channel) ,' SET TO ', num2str(GAIN_round), ' V/V', '\r']);
-            else
-                error(['COMMUNICATION ERROR: PREGAIN', '\r'])
+                else
+                    error(['COMMUNICATION ERROR: PREGAIN', '\r'])
+                end
             end
         end
         
-        % idea for set() with switch and string parsing
+        %% postgain KSC
+        function postgainKSC(self, channel, gain)
+        % set the postgain (max is 16)
+        % params: 
+        % channel: channel to be modified
+        % gain: the value for the postgain
+        
+            % set gain
+            % only change if different
+            GAIN_round = round(gain/0.0125)*0.0125;
+            if gain>16
+                GAIN_round = 16;
+            end
+            
+            if (abs(self.Postgain{channel}-GAIN_round)>0.001)
+                fprintf(self.comPORT,[num2str(channel),':POSTGAIN = ',...
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, '%s'));
+
+                if abs(str2double(verify)- GAIN_round)<0.001
+%                 fprintf(['POSTGAIN FOR CHANNEL ', num2str(channel) ,' SET TO ', num2str(GAIN_round), ' V/V', '\r']);
+                else
+                    error(['COMMUNICATION ERROR: POSTGAIN', '\r'])
+                end
+            end
+        end
+        
+        %% save KSC
+        function save(self)
+        % save the state of the KSC-2 in non-volatile memory
+        
+            % save current state
+            % only if it is updated
+            if self.isUpdated
+            fprintf(self.comPORT, ['SAVE']);
+            verify = (fscanf(self.comPORT, '%s'));    
+                if strcmp(verify, 'DONE')
+                    self.isUpdated = false;
+%                     fprintf(['CURRENT DEVICE CONFIGURATION SAVED TO NONVOLATILE MEMORY', '\r']);
+                else
+                    error(['COMMUNICATION ERROR: CONFIGURATION NOT SAVED', '\r'])
+                end
+            end
+        end
+        
+% idea for set() with switch and string parsing
+
     end
     
     methods (Static)
