@@ -1,7 +1,7 @@
 %% Class for the KSC2. Includes API and error handling.
 % @author: Emmanuel Koumandakis (emmanuel@kulite.com)
 % Based on the MATLAB API developed by Haig Norian and Adam Hurst
-classdef KSC2 < handle % < matlab.mixin.SetGet
+classdef KSC2 < handle & matlab.mixin.SetGet
     
     % most properties are Capitalized to comply with MATLAB Styling
     % apart from SN, comPORT, isUpdated and printable, all other 
@@ -82,8 +82,8 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
             self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?', '%s\n' ,'%s');
             self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?', '%s\n' ,'%s');
             self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?', '%s\n' ,'%s');
-            self.OverloadOutLim{1} = query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s');
-            self.OverloadOutLim{2} = query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s');
+            self.OverloadOutLimit{1} = str2double(query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s'));
+            self.OverloadOutLimit{2} = str2double(query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s'));
             
             if (self.Printable)
                 fprintf(['KSC-2: SN-', self.SN, ...
@@ -123,7 +123,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 if strcmp(verify, coupling)
                     self.isUpdated = true;
                     self.Coupling{channel} = coupling;
-%                     fprintf(['COUPLING FOR CHANNEL ', num2str(CH) ,' SET TO ', COUPLING, '\r']);
+                    self.isUpdated = true;
                 else
                     error(['COMMUNICATION ERROR: COUPLING', '\r'])
                 end
@@ -153,7 +153,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 if strcmp(verify, mode)
                     self.isUpdated = true;                        
                     self.OperationMode{channel} = mode;
-%                     fprintf(['MODE FOR CHANNEL ', num2str(CH) ,' SET TO ', MODE, '\r']);
+                    self.isUpdated = true;
                 else
                     error(['COMMUNICATION ERROR: SHIELD', '\r'])
                 end
@@ -180,8 +180,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
 
                 if str2double(verify) == FC_round
                     self.FrequencyCutoff{channel} = FC_round;
-%             fprintf(['FILTER CUTOFF FOR CHANNEL ', num2str(channel),...
-%                 ' SET TO ', num2str(FC_round), 'Hz', '\r']);
+                    self.isUpdated = true;
                 else
                     error(['COMMUNICATION ERROR: FC', '\r'])
                 end
@@ -194,8 +193,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
                 verify = (fscanf(self.comPORT, '%s'));
                 if strcmp(verify, type)
                     self.FilterType{channel} = type;
-%                     fprintf(['FILTER TYPE FOR CHANNEL ',...
-%                         num2str(channel) ,' SET TO ', type, '\r']);
+                    self.isUpdated = true;
                 else
                     error(['COMMUNICATION ERROR: FILTER TYPE', '\r'])
                 end
@@ -261,7 +259,7 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
         % when the REZCOMP filter is on
         
             % make uppercase
-            compfilt_onoff = upper(compfilt_onoff)
+            compfilt_onoff = upper(compfilt_onoff);
             
             if (length(varargin) > 2)
                 error('TOO MANY ARGUMENTS')
@@ -446,6 +444,46 @@ classdef KSC2 < handle % < matlab.mixin.SetGet
             end
         end
         
+        function self = set.Coupling(self, value)
+            % if value is string, parse into cell array 
+            if ischar(value)
+                % clear whitespace
+                value = regexp(value, '\S+', 'match');
+                value = strjoin(value,'');
+                value = strsplit(value,',');
+            end
+            
+            if iscell(value)
+                if length(value) == 2
+                    if ~isempty(value{1})
+                        channel = 1;
+                        coupling = value{1};
+                        coupling = upper(coupling);
+                        
+                        % set coupling (AC, DC)
+                        % only change if different
+                        if ~strcmp(self.Coupling{channel}, coupling) 
+                            fprintf(self.comPORT, [num2str(channel), ':COUPLING = ',...
+                                coupling]);
+                            verify = (fscanf(self.comPORT, '%s'));
+                            if strcmp(verify, coupling)
+                                self.Coupling{channel} = coupling;
+                                self.isUpdated = true;
+                            else
+                                error(['COMMUNICATION ERROR: COUPLING', '\r'])
+                            end
+                        end
+                    end
+                    if ~isempty(value{2})
+                        
+                    end   
+                else
+                    error('Incorrect Usage');
+                end
+            else
+                error('Incorrect Usage');
+            end
+        end
 % idea for set() with switch and string parsing
 
     end
