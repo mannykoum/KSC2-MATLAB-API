@@ -1,17 +1,20 @@
-%% Class for the KSC2. Includes API and error handling.
+%% Class for the KSC2
+% Standalone class. Includes API and error handling.
 % @author: Emmanuel Koumandakis (emmanuel@kulite.com)
+%
 % Based on the MATLAB API developed by Haig Norian and Adam Hurst
-classdef KSC2 < handle % matlab.mixin.SetGet
+
+
+classdef KSC2
     
     % most properties are Capitalized to comply with MATLAB Styling
-    % apart from SN, comPORT, isUpdated and printable, all other 
+    % apart from SN, comPORT and isUpdated, all other 
     % properties are cell arrays of length 2 (1 cell/channel)
     properties (SetAccess = protected)
         comPORT
         SN
-        Printable = false;
-        isUpdated = false; % an object is updated if its current state is 
-                           % different than the saved state
+        % object's current state is different than the saved state
+        isUpdated = false; 
         Coupling 
         ShieldMode
         OperationMode
@@ -33,13 +36,15 @@ classdef KSC2 < handle % matlab.mixin.SetGet
     %% Methods
     methods
         
-        % Constructor
-        function self = KSC2(COM, pr)
+        %%% Constructor
+        function self = KSC2(COM)
             if (nargin == 0)
-                COM = findserial();
-            elseif (nargin == 2)
-                self.Printable = pr;
-            elseif (nargin > 2)
+                % if no ports are given, assign one with findserial()
+                COM = KSC2.findserial();
+            elseif (nargin > 1)
+                % Ideally every error should be implemented with custom
+                % exceptions like the one below, so that the user can do
+                % try-catch exception handling for specific exceptions
                 MEusage = MException('KCS2:incorrectUsage',...
                     'Incorrect number of args.');
                 throw(MEusage)
@@ -50,7 +55,8 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                 8, 'Parity', 'none', 'StopBits', 1);
             fopen(self.comPORT);
 
-            % Get settings and set attributes
+            % Get settings and set attributes (also only block of code
+            % where the lines pass the 75 character limit ... )
             self.SN = query(self.comPORT, ['SN?'], '%s\n' ,'%s');
             self.Coupling{1} = query(self.comPORT, '1:COUPLING?', '%s\n' ,'%s');
             self.Coupling{2} = query(self.comPORT, '2:COUPLING?', '%s\n' ,'%s');
@@ -84,31 +90,27 @@ classdef KSC2 < handle % matlab.mixin.SetGet
             self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?', '%s\n' ,'%s');
             self.OverloadOutLimit{1} = str2double(query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s'));
             self.OverloadOutLimit{2} = str2double(query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s'));
-            
-            if (self.Printable)
-                fprintf(['KSC-2: SN-', self.SN, ...
-                    ' HAS BEEN SUCCESSFULLY CONNECTED TO ' , COM, '\r']);
-            end
         end
         
         
-        % Destructor
+        %%% Destructor
         function delete(self)
+        % destructor method to take care of closing the file descriptor
             fclose(self.comPORT);
-            if (self.Printable)
-                fprintf(['KSC-2: SN-', self.SN, ...
-                 ' HAS BEEN DISCONNECTED FROM COMMUNICATION PORT','\r \r'])
-            end
             delete(self.comPORT);
             clear self
         end
         
         function del(self); delete(self); end
+        % function to call delete faster (used 'del' in other languages)
+
+        %% Methods to set attributes + settings
         
-        
-        %% configure KSC 
+        %%% configure KSC 
         function configure(self, channel, coupling, shield, mode)
         % change coupling, shield mode, and operation mode for each channel
+        %
+        % TODO: add available parameters
             
             coupling = upper(coupling);
             shield = upper(shield);
@@ -125,21 +127,21 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.Coupling{channel} = coupling;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: COUPLING', '\r'])
+                    error('COMMUNICATION ERROR: COUPLING');
                 end
             end
                 
             % set shield mode
             % only change if different
             if ~strcmp(self.ShieldMode{channel}, shield)
-                fprintf(self.comPORT, [num2str(channel),':SHIELD = ',shield]);
+                fprintf(self.comPORT,[num2str(channel),':SHIELD = ',...
+                    shield]);
                 verify = (fscanf(self.comPORT, '%s'));
                 if strcmp(verify, shield)
                     self.isUpdated = true;                        
                     self.ShieldMode{channel} = shield;
-%                     fprintf(['SHIELD FOR CHANNEL ', num2str(CH) ,' SET TO ', SHIELD, '\r']);
                 else
-                    error(['COMMUNICATION ERROR: MODE', '\r'])
+                    error('COMMUNICATION ERROR: MODE');
                 end
 
             end
@@ -148,22 +150,25 @@ classdef KSC2 < handle % matlab.mixin.SetGet
             % set operation mode
             % only change if different
             if ~strcmp(self.OperationMode{channel}, mode)
-                fprintf(self.comPORT, [num2str(channel), ':MODE = ', mode]);
+                fprintf(self.comPORT,[num2str(channel),':MODE = ',mode]);
                 verify = (fscanf(self.comPORT, '%s'));
                 if strcmp(verify, mode)
                     self.isUpdated = true;                        
                     self.OperationMode{channel} = mode;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: SHIELD', '\r'])
+                    error('COMMUNICATION ERROR: SHIELD');
                 end
             end
         end
         
-        %% filter KSC
+        %%% filter KSC
         function filter(self, channel, freq_cut, type)
-        % Change the filter type, cutoff frequency
-
+        % change the filter type, cutoff frequency
+        %
+        % TODO: add available parameters
+            
+            % make uppercase
             type = upper(type);
             
             % set FC
@@ -182,7 +187,7 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.FrequencyCutoff{channel} = FC_round;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: FC', '\r'])
+                    error('COMMUNICATION ERROR: FC');
                 end
             end
 
@@ -195,14 +200,17 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.FilterType{channel} = type;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: FILTER TYPE', '\r'])
+                    error('COMMUNICATION ERROR: FILTER TYPE');
                 end
             end
         end
 
         
-        %% excitation KSC
+        %%% excitation KSC
         function excitation(self, channel, voltage, exc_type, sense)
+        % set the excitation voltage, type and sense mode
+        %
+        % TODO: add available parameters
             
             % make uppercase
             exc_type = upper(exc_type);
@@ -220,7 +228,7 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.ExcitationVoltage{channel} = V_round;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: EXC', '\r'])
+                    error('COMMUNICATION ERROR: EXC');
                 end
             end
 
@@ -234,25 +242,25 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.ExcitationType{channel} = exc_type;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: EXCITATION TYPE', '\r'])
+                    error('COMMUNICATION ERROR: EXCITATION TYPE');
                 end
             end
                 
             % set sense mode
             % only change is different
             if ~strcmp(self.SenseMode{channel}, sense)
-                fprintf(self.comPORT, [num2str(channel), ':SENSE = ', sense]);
+                fprintf(self.comPORT,[num2str(channel),':SENSE = ',sense]);
                 verify = (fscanf(self.comPORT, '%s'));
                 if strcmp(verify, sense)
                     self.SenseMode{channel} = sense;
                     self.isUpdated = true;                
                 else
-                    error(['COMMUNICATION ERROR: SENSE MODE', '\r'])
+                    error('COMMUNICATION ERROR: SENSE MODE');
                 end
             end
         end
         
-        %% cavitycompKSC 
+        %%% cavitycompKSC 
         function cavitycomp(self, channel, compfilt_onoff, varargin)
         % takes the parameters to compensate for the Helmholtz resonance
         % the resonant frequency and quality factor can only be modified
@@ -262,12 +270,13 @@ classdef KSC2 < handle % matlab.mixin.SetGet
             compfilt_onoff = upper(compfilt_onoff);
             
             if (length(varargin) > 2)
-                error('TOO MANY ARGUMENTS')
+                error('TOO MANY ARGUMENTS');
             end
             
             if strcmp(compfilt_onoff, 'ON')
                 compfilt_fc = varargin{1};
                 compfilt_q = varargin{2};
+                
                 % set the switch
                 % only change if different
                 if ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
@@ -277,7 +286,7 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                         self.CompensationSwitch{channel} = compfilt_onoff;
                         self.isUpdated = true;
                     else
-                        error(['COMMUNICATION ERROR: COMPFILT', '\r']);
+                        error('COMMUNICATION ERROR: COMPFILT');
                     end
                 end
                 
@@ -290,7 +299,7 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                         self.ResonantFrequency{channel} = compfilt_fc;
                         self.isUpdated = true;
                     else
-                        error(['COMMUNICATION ERROR: COMPFILTFC', '\r']);
+                        error('COMMUNICATION ERROR: COMPFILTFC');
                     end
                 end
                 
@@ -303,33 +312,33 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                         self.QualityFactor{channel} = compfilt_q;
                         self.isUpdated = true;
                     else
-                        error(['COMMUNICATION ERROR: COMPFILTQ', '\r']);
+                        error('COMMUNICATION ERROR: COMPFILTQ');
                     end
                 end
                 
             elseif strcmp(compfilt_onoff, 'OFF') 
             % in case it's OFF, don't care about FC and Q
                 if ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
-                    verifyCC=query(self.comPORT,[num2str(channel),':COMPFILT = ',...
-                        compfilt_onoff]);
+                    verifyCC=query(self.comPORT,[num2str(channel),...
+                        ':COMPFILT = ',compfilt_onoff]);
                     if strcmp(verifyCC, compfilt_onoff)
                         self.CompensationSwitch{channel} = compfilt_onoff;
                         self.isUpdated = true;
                     else
-                        error(['COMMUNICATION ERROR: COMPFILT', '\r']);
+                        error('COMMUNICATION ERROR: COMPFILT');
                     end
                 end
             end
             
         end
 
-        %% pregain KSC        
+        %%% pregain KSC        
         function pregain(self, channel, gain)
         % set the pregain (automatically sets any number to the closest
         % power of 2)
         % params: 
         % channel: channel to be modified
-        % gain: the value for the pregain
+        % gain: the value for the pregain (max 128)
         
             % set gain
             % only change if different
@@ -355,12 +364,12 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.Pregain{channel} = GAIN_round;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: PREGAIN', '\r'])
+                    error('COMMUNICATION ERROR: PREGAIN');
                 end
             end
         end
         
-        %% postgain KSC
+        %%% postgain KSC
         function postgain(self, channel, gain)
         % set the postgain (max is 16)
         % params: 
@@ -383,28 +392,35 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.Postgain{channel} = GAIN_round;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: POSTGAIN', '\r'])
+                    error('COMMUNICATION ERROR: POSTGAIN');
                 end
             end
         end
         
-        %% overload KSC
+        %%% overload KSC
         function [ovldIn1,ovldIn2,ovldOut1,ovldOut2] = ovldUpdate(self)
         % simple method to update the state of the overload
-            self.OverloadIn{1} = query(self.comPORT, '1:INOVLD?', '%s\n' ,'%s');
-            self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?', '%s\n' ,'%s');
-            self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?', '%s\n' ,'%s');
-            self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?', '%s\n' ,'%s'); 
+        % returns: the overload state for all input and output channels
+            self.OverloadIn{1} = query(self.comPORT, '1:INOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?',... 
+                '%s\n' ,'%s'); 
             ovldIn1 = self.OverloadIn{1};
             ovldIn2 = self.OverloadIn{2};
             ovldOut1 = self.OverloadOut{1};
             ovldOut2 = self.OverloadOut{2};
         end
         
-        %% ovldset KSC
+        %%% ovldset KSC
         function setOvldLim(self, channel, limit)
         % set the output voltage limit
-            
+        % limit needs to be b/w 0.1 and 10.2
+        % if it is above 10.2 V it will be assigned the maximum value and
+        % if it is below 0.1 V it will be assigned the minimum value
             lim_round = round(limit/0.1)*0.1;
             if limit > 10.2
                 lim_round = 10.2;
@@ -412,7 +428,8 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                 lim_round = 0.1;
             end
             
-            %only change if different
+            % set the limit
+            % only change if different
             if (self.OverloadOutLimit{channel} ~= lim_round)
                 fprintf(self.comPORT,[num2str(channel),...
                     ':OUTOVLDLIM = ',num2str(lim_round)]);
@@ -421,13 +438,13 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                     self.OverloadOutLimit{channel} = lim_round;
                     self.isUpdated = true;
                 else
-                    error(['COMMUNICATION ERROR: OVERLOAD SET', '\r'])
+                    error('COMMUNICATION ERROR: OVERLOAD SET');
                 end
                 
             end
         end
         
-        %% save KSC
+        %%% save KSC
         function save(self)
         % save the state of the KSC-2 in non-volatile memory
         
@@ -439,87 +456,38 @@ classdef KSC2 < handle % matlab.mixin.SetGet
                 if strcmp(verify, 'DONE')
                     self.isUpdated = false;
                 else
-                    error(['COMMUNICATION ERROR: CONFIGURATION NOT SAVED', '\r'])
+                    error('COMMUNICATION ERROR: CONFIGURATION NOT SAVED');
                 end
             end
         end
-        
-        
-%         %% Setter methods
-%         
-%         %% coupling setter
-%         function self = set.Coupling(self, value)
-%             % if value is string, parse into cell array 
-%             if ischar(value)
-%                 % clear whitespace
-%                 value = regexp(value, '\S+', 'match');
-%                 value = strjoin(value,'');
-%                 value = strsplit(value,',');
-%             end
-%             
-%             if iscell(value)
-%                 if length(value) == 2
-%                     if ~isempty(value{1})
-%                         channel = 1;
-%                         coupling = value{1};
-%                         coupling = upper(coupling);
-%                         
-%                         % set coupling (AC, DC)
-%                         % only change if different
-%                         if ~strcmp(self.Coupling{channel}, coupling) 
-%                             fprintf(self.comPORT, [num2str(channel), ':COUPLING = ',...
-%                                 coupling]);
-%                             verify = (fscanf(self.comPORT, '%s'));
-%                             if strcmp(verify, coupling)
-%                                 self.Coupling{channel} = coupling;
-%                                 self.isUpdated = true;
-%                             else
-%                                 error(['COMMUNICATION ERROR: COUPLING', '\r'])
-%                             end
-%                         end
-%                     end
-%                     if ~isempty(value{2})
-%                         channel = 2;
-%                         coupling = value{2};
-%                         coupling = upper(coupling);
-%                         
-%                         % set coupling (AC, DC)
-%                         % only change if different
-%                         if ~strcmp(self.Coupling{channel}, coupling) 
-%                             fprintf(self.comPORT, [num2str(channel), ':COUPLING = ',...
-%                                 coupling]);
-%                             verify = (fscanf(self.comPORT, '%s'));
-%                             if strcmp(verify, coupling)
-%                                 self.Coupling{channel} = coupling;
-%                                 self.isUpdated = true;
-%                             else
-%                                 error(['COMMUNICATION ERROR: COUPLING', '\r'])
-%                             end
-%                         end
-%                     end   
-%                 else
-%                     error('Incorrect Usage');
-%                 end
-%             else
-%                 error('Incorrect Usage');
-%             end
-%         end
-% idea for set() with switch and string parsing
-
     end
     
+    %% Static methods
     methods (Static)
+        
+        %%% Create array of KSC2 Objects
         function arr = createArray(COM)
             % create a cell array of KSC2 objects
             
             if (nargin == 0)
-                COM = findserial();
+                % if no ports are given, assign them with findserial()
+                COM = KSC2.findserial();
             end
             % preallocate cell array
             arr{length(COM)} = [];
             for i = 1:length(COM)
                 arr{i} = KSC2(COM{i});
             end
+        end
+        
+        %%% find serial ports
+        function ports = findserial()
+        % returns cell array of found serial ports under Win
+        % uses CLI MODE command internally
+            [~,res]=system('mode'); 
+            % regexp returns only the 'COM#' from the data returned from 
+            %system
+            ports=regexp(res,'COM\d+','match'); % ports is an array of str
         end
     end
 end

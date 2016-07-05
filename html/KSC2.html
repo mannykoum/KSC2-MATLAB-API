@@ -1,0 +1,1041 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>KSC2</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-07-05"><meta name="DC.source" content="KSC2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Class for the KSC2</a></li><li><a href="#3">Methods</a></li><li><a href="#5">Constructor</a></li><li><a href="#6">Destructor</a></li><li><a href="#7">Methods to set attributes + settings</a></li><li><a href="#8">configure KSC</a></li><li><a href="#9">filter KSC</a></li><li><a href="#10">excitation KSC</a></li><li><a href="#11">cavitycompKSC</a></li><li><a href="#12">pregain KSC</a></li><li><a href="#13">postgain KSC</a></li><li><a href="#14">overload KSC</a></li><li><a href="#15">ovldset KSC</a></li><li><a href="#16">save KSC</a></li><li><a href="#18">Static methods</a></li><li><a href="#19">Create array of KSC2 Objects</a></li><li><a href="#20">find serial ports</a></li></ul></div><h2>Class for the KSC2<a name="1"></a></h2><p>Standalone class. Includes API and error handling. @author: Emmanuel Koumandakis (<a href="mailto:emmanuel@kulite.com">emmanuel@kulite.com</a>)</p><p>Based on the MATLAB API developed by Haig Norian and Adam Hurst</p><pre class="codeinput"><span class="keyword">classdef</span> KSC2
+</pre><pre class="codeinput">    <span class="comment">% most properties are Capitalized to comply with MATLAB Styling</span>
+    <span class="comment">% apart from SN, comPORT and isUpdated, all other</span>
+    <span class="comment">% properties are cell arrays of length 2 (1 cell/channel)</span>
+    properties (SetAccess = protected)
+        comPORT
+        SN
+        <span class="comment">% object's current state is different than the saved state</span>
+        isUpdated = false;
+        Coupling
+        ShieldMode
+        OperationMode
+        FilterType
+        FrequencyCutoff
+        Postgain
+        Pregain
+        ExcitationVoltage
+        ExcitationType
+        SenseMode
+        CompensationSwitch
+        ResonantFrequency
+        QualityFactor
+        OverloadIn
+        OverloadOut
+        OverloadOutLimit
+    <span class="keyword">end</span>
+</pre><h2>Methods<a name="3"></a></h2><pre class="codeinput">    methods
+</pre><h2>Constructor<a name="5"></a></h2><pre class="codeinput">        <span class="keyword">function</span> self = KSC2(COM)
+            <span class="keyword">if</span> (nargin == 0)
+                <span class="comment">% if no ports are given, assign one with findserial()</span>
+                COM = KSC2.findserial();
+            <span class="keyword">elseif</span> (nargin &gt; 1)
+                <span class="comment">% Ideally every error should be implemented with custom</span>
+                <span class="comment">% exceptions like the one below, so that the user can do</span>
+                <span class="comment">% try-catch exception handling for specific exceptions</span>
+                MEusage = MException(<span class="string">'KCS2:incorrectUsage'</span>,<span class="keyword">...</span>
+                    <span class="string">'Incorrect number of args.'</span>);
+                throw(MEusage)
+            <span class="keyword">end</span>
+
+            <span class="comment">% Open port</span>
+            self.comPORT = serial(COM, <span class="string">'BaudRate'</span>, 57600, <span class="string">'DataBits'</span>,<span class="keyword">...</span>
+                8, <span class="string">'Parity'</span>, <span class="string">'none'</span>, <span class="string">'StopBits'</span>, 1);
+            fopen(self.comPORT);
+
+            <span class="comment">% Get settings and set attributes (also only block of code</span>
+            <span class="comment">% where the lines pass the 75 character limit ... )</span>
+            self.SN = query(self.comPORT, [<span class="string">'SN?'</span>], <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.Coupling{1} = query(self.comPORT, <span class="string">'1:COUPLING?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.Coupling{2} = query(self.comPORT, <span class="string">'2:COUPLING?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.ShieldMode{1} = query(self.comPORT, <span class="string">'1:SHIELD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.ShieldMode{2} = query(self.comPORT, <span class="string">'2:SHIELD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OperationMode{1} = query(self.comPORT, <span class="string">'1:MODE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OperationMode{2} = query(self.comPORT, <span class="string">'2:MODE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.FilterType{1} = query(self.comPORT, <span class="string">'1:FILTER?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.FilterType{2} = query(self.comPORT, <span class="string">'2:FILTER?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.FrequencyCutoff{1} = str2double(query(self.comPORT, <span class="string">'1:FC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.FrequencyCutoff{2} = str2double(query(self.comPORT, <span class="string">'2:FC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.Postgain{1} = str2double(query(self.comPORT, <span class="string">'1:POSTGAIN?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.Postgain{2} = str2double(query(self.comPORT, <span class="string">'2:POSTGAIN?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.Pregain{1} = str2double(query(self.comPORT, <span class="string">'1:PREGAIN?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.Pregain{2} = str2double(query(self.comPORT, <span class="string">'2:PREGAIN?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.ExcitationVoltage{1} = str2double(query(self.comPORT, <span class="string">'1:EXC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.ExcitationVoltage{2} = str2double(query(self.comPORT, <span class="string">'2:EXC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.ExcitationType{1} = query(self.comPORT, <span class="string">'1:EXCTYPE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.ExcitationType{2} = query(self.comPORT, <span class="string">'2:EXCTYPE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.SenseMode{1} = query(self.comPORT, <span class="string">'1:SENSE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.SenseMode{2} = query(self.comPORT, <span class="string">'2:SENSE?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.CompensationSwitch{1} = query(self.comPORT, <span class="string">'1:COMPFILT?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.CompensationSwitch{2} = query(self.comPORT, <span class="string">'2:COMPFILT?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.ResonantFrequency{1} = str2double(query(self.comPORT, <span class="string">'1:COMPFILTFC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.ResonantFrequency{2} = str2double(query(self.comPORT, <span class="string">'2:COMPFILTFC?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.QualityFactor{1} = str2double(query(self.comPORT, <span class="string">'1:COMPFILTQ?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.QualityFactor{2} = str2double(query(self.comPORT, <span class="string">'2:COMPFILTQ?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.OverloadIn{1} = query(self.comPORT, <span class="string">'1:INOVLD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadIn{2} = query(self.comPORT, <span class="string">'2:INOVLD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadOut{1} = query(self.comPORT, <span class="string">'1:OUTOVLD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadOut{2} = query(self.comPORT, <span class="string">'2:OUTOVLD?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadOutLimit{1} = str2double(query(self.comPORT, <span class="string">'1:OUTOVLDLIM?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+            self.OverloadOutLimit{2} = str2double(query(self.comPORT, <span class="string">'2:OUTOVLDLIM?'</span>, <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>));
+        <span class="keyword">end</span>
+</pre><h2>Destructor<a name="6"></a></h2><pre class="codeinput">        <span class="keyword">function</span> delete(self)
+        <span class="comment">% destructor method to take care of closing the file descriptor</span>
+            fclose(self.comPORT);
+            delete(self.comPORT);
+            clear <span class="string">self</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> del(self); delete(self); <span class="keyword">end</span>
+        <span class="comment">% function to call delete faster (used 'del' in other languages)</span>
+</pre><pre class="codeoutput">
+ans = 
+
+  KSC2 with properties:
+
+               comPORT: [1x1 serial]
+                    SN: '189314-005'
+             isUpdated: 0
+              Coupling: {'AC'  'DC'}
+            ShieldMode: {'GROUND'  'GROUND'}
+         OperationMode: {'OPERATE'  'OPERATE'}
+            FilterType: {'FLAT'  'FLAT'}
+       FrequencyCutoff: {[20000]  [20000]}
+              Postgain: {[16]  [1]}
+               Pregain: {[32]  [1]}
+     ExcitationVoltage: {[10]  [12]}
+        ExcitationType: {'BIPOLAR'  'BIPOLAR'}
+             SenseMode: {'REMOTE'  'LOCAL'}
+    CompensationSwitch: {'OFF'  'ON'}
+     ResonantFrequency: {[10]  [700]}
+         QualityFactor: {[1]  [50]}
+            OverloadIn: {'0'  '0'}
+           OverloadOut: {'0'  '0'}
+      OverloadOutLimit: {[10]  [10]}
+
+</pre><h2>Methods to set attributes + settings<a name="7"></a></h2><h2>configure KSC<a name="8"></a></h2><pre class="codeinput">        <span class="keyword">function</span> configure(self, channel, coupling, shield, mode)
+        <span class="comment">% change coupling, shield mode, and operation mode for each channel</span>
+        <span class="comment">%</span>
+        <span class="comment">% TODO: add available parameters</span>
+
+            coupling = upper(coupling);
+            shield = upper(shield);
+            mode = upper(mode);
+
+            <span class="comment">% set coupling (AC, DC)</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.Coupling{channel}, coupling)
+                fprintf(self.comPORT, [num2str(channel), <span class="string">':COUPLING = '</span>,<span class="keyword">...</span>
+                    coupling]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, coupling)
+                    self.isUpdated = true;
+                    self.Coupling{channel} = coupling;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: COUPLING'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% set shield mode</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.ShieldMode{channel}, shield)
+                fprintf(self.comPORT,[num2str(channel),<span class="string">':SHIELD = '</span>,<span class="keyword">...</span>
+                    shield]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, shield)
+                    self.isUpdated = true;
+                    self.ShieldMode{channel} = shield;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: MODE'</span>);
+                <span class="keyword">end</span>
+
+            <span class="keyword">end</span>
+
+
+            <span class="comment">% set operation mode</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.OperationMode{channel}, mode)
+                fprintf(self.comPORT,[num2str(channel),<span class="string">':MODE = '</span>,mode]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, mode)
+                    self.isUpdated = true;
+                    self.OperationMode{channel} = mode;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: SHIELD'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>filter KSC<a name="9"></a></h2><pre class="codeinput">        <span class="keyword">function</span> filter(self, channel, freq_cut, type)
+        <span class="comment">% change the filter type, cutoff frequency</span>
+        <span class="comment">%</span>
+        <span class="comment">% TODO: add available parameters</span>
+
+            <span class="comment">% make uppercase</span>
+            type = upper(type);
+
+            <span class="comment">% set FC</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.FrequencyCutoff{channel}, freq_cut)
+                fprintf(self.comPORT, [num2str(channel), <span class="string">':FC = '</span>,<span class="keyword">...</span>
+                    num2str(freq_cut)]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+
+                FC_round = round(freq_cut/500)*500;
+                <span class="keyword">if</span> freq_cut&lt;250
+                    FC_round = 500;
+                <span class="keyword">end</span>
+
+                <span class="keyword">if</span> str2double(verify) == FC_round
+                    self.FrequencyCutoff{channel} = FC_round;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: FC'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% set filter type</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.FilterType{channel}, type)
+                fprintf(self.comPORT,[num2str(channel),<span class="string">':FILTER = '</span>,type]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, type)
+                    self.FilterType{channel} = type;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: FILTER TYPE'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>excitation KSC<a name="10"></a></h2><pre class="codeinput">        <span class="keyword">function</span> excitation(self, channel, voltage, exc_type, sense)
+        <span class="comment">% set the excitation voltage, type and sense mode</span>
+        <span class="comment">%</span>
+        <span class="comment">% TODO: add available parameters</span>
+
+            <span class="comment">% make uppercase</span>
+            exc_type = upper(exc_type);
+            sense = upper(sense);
+
+            <span class="comment">% set excitation voltage</span>
+            <span class="comment">% only change if different</span>
+            V_round = round(voltage/0.00125)*0.00125;
+            <span class="keyword">if</span> V_round ~= self.ExcitationVoltage{channel}
+                fprintf(self.comPORT, [num2str(channel), <span class="string">':EXC = '</span>,<span class="keyword">...</span>
+                    num2str(voltage)]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+
+                <span class="keyword">if</span> str2double(verify) == V_round
+                    self.ExcitationVoltage{channel} = V_round;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: EXC'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% set excitation voltage type</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> ~strcmp(self.ExcitationType{channel}, exc_type)
+                fprintf(self.comPORT, [num2str(channel), <span class="string">':EXCTYPE = '</span>,<span class="keyword">...</span>
+                    exc_type]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, exc_type)
+                    self.ExcitationType{channel} = exc_type;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: EXCITATION TYPE'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% set sense mode</span>
+            <span class="comment">% only change is different</span>
+            <span class="keyword">if</span> ~strcmp(self.SenseMode{channel}, sense)
+                fprintf(self.comPORT,[num2str(channel),<span class="string">':SENSE = '</span>,sense]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, sense)
+                    self.SenseMode{channel} = sense;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: SENSE MODE'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>cavitycompKSC<a name="11"></a></h2><pre class="codeinput">        <span class="keyword">function</span> cavitycomp(self, channel, compfilt_onoff, varargin)
+        <span class="comment">% takes the parameters to compensate for the Helmholtz resonance</span>
+        <span class="comment">% the resonant frequency and quality factor can only be modified</span>
+        <span class="comment">% when the REZCOMP filter is on</span>
+
+            <span class="comment">% make uppercase</span>
+            compfilt_onoff = upper(compfilt_onoff);
+
+            <span class="keyword">if</span> (length(varargin) &gt; 2)
+                error(<span class="string">'TOO MANY ARGUMENTS'</span>);
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> strcmp(compfilt_onoff, <span class="string">'ON'</span>)
+                compfilt_fc = varargin{1};
+                compfilt_q = varargin{2};
+
+                <span class="comment">% set the switch</span>
+                <span class="comment">% only change if different</span>
+                <span class="keyword">if</span> ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
+                    verifyCC=query(self.comPORT,[num2str(channel),<span class="keyword">...</span>
+                        <span class="string">':COMPFILT = '</span>,compfilt_onoff]);
+                    <span class="keyword">if</span> strcmp(verifyCC, compfilt_onoff)
+                        self.CompensationSwitch{channel} = compfilt_onoff;
+                        self.isUpdated = true;
+                    <span class="keyword">else</span>
+                        error(<span class="string">'COMMUNICATION ERROR: COMPFILT'</span>);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+                <span class="comment">% set the FC</span>
+                <span class="comment">% only change if different</span>
+                <span class="keyword">if</span> (self.ResonantFrequency{channel}~=compfilt_fc)
+                    verifyCCFC=query(self.comPORT,[num2str(channel),<span class="keyword">...</span>
+                        <span class="string">':COMPFILTFC = '</span>,compfilt_fc]);
+                    <span class="keyword">if</span> strcmp(verifyCCFC, compfilt_fc)
+                        self.ResonantFrequency{channel} = compfilt_fc;
+                        self.isUpdated = true;
+                    <span class="keyword">else</span>
+                        error(<span class="string">'COMMUNICATION ERROR: COMPFILTFC'</span>);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+                <span class="comment">% set the Q</span>
+                <span class="comment">% only change if different</span>
+                <span class="keyword">if</span> (self.QualityFactor{channel}~=compfilt_q)
+                    verifyCCQ=query(self.comPORT,[num2str(channel),<span class="keyword">...</span>
+                        <span class="string">':COMPFILTQ = '</span>,compfilt_q]);
+                    <span class="keyword">if</span> strcmp(verifyCCQ, compfilt_q)
+                        self.QualityFactor{channel} = compfilt_q;
+                        self.isUpdated = true;
+                    <span class="keyword">else</span>
+                        error(<span class="string">'COMMUNICATION ERROR: COMPFILTQ'</span>);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+            <span class="keyword">elseif</span> strcmp(compfilt_onoff, <span class="string">'OFF'</span>)
+            <span class="comment">% in case it's OFF, don't care about FC and Q</span>
+                <span class="keyword">if</span> ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
+                    verifyCC=query(self.comPORT,[num2str(channel),<span class="keyword">...</span>
+                        <span class="string">':COMPFILT = '</span>,compfilt_onoff]);
+                    <span class="keyword">if</span> strcmp(verifyCC, compfilt_onoff)
+                        self.CompensationSwitch{channel} = compfilt_onoff;
+                        self.isUpdated = true;
+                    <span class="keyword">else</span>
+                        error(<span class="string">'COMMUNICATION ERROR: COMPFILT'</span>);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+</pre><h2>pregain KSC<a name="12"></a></h2><pre class="codeinput">        <span class="keyword">function</span> pregain(self, channel, gain)
+        <span class="comment">% set the pregain (automatically sets any number to the closest</span>
+        <span class="comment">% power of 2)</span>
+        <span class="comment">% params:</span>
+        <span class="comment">% channel: channel to be modified</span>
+        <span class="comment">% gain: the value for the pregain (max 128)</span>
+
+            <span class="comment">% set gain</span>
+            <span class="comment">% only change if different</span>
+            n = nextpow2(gain);
+            hi = 2^n;
+            lo = 2^(n-1);
+            <span class="keyword">if</span> abs(hi-gain) &lt;= abs(lo-gain)
+                GAIN_round = hi;
+            <span class="keyword">else</span>
+                GAIN_round = lo;
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> gain&gt;128
+                GAIN_round = 128;
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> (abs(self.Pregain{channel}-GAIN_round)&gt;0.001)
+                fprintf(self.comPORT, [num2str(channel), <span class="string">':PREGAIN = '</span>,<span class="keyword">...</span>
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+
+                <span class="keyword">if</span> (abs(str2double(verify)- GAIN_round) &lt; 0.001)
+                    self.Pregain{channel} = GAIN_round;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: PREGAIN'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>postgain KSC<a name="13"></a></h2><pre class="codeinput">        <span class="keyword">function</span> postgain(self, channel, gain)
+        <span class="comment">% set the postgain (max is 16)</span>
+        <span class="comment">% params:</span>
+        <span class="comment">% channel: channel to be modified</span>
+        <span class="comment">% gain: the value for the postgain</span>
+
+            <span class="comment">% set gain</span>
+            <span class="comment">% only change if different</span>
+            GAIN_round = round(gain/0.0125)*0.0125;
+            <span class="keyword">if</span> gain&gt;16
+                GAIN_round = 16;
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> (abs(self.Postgain{channel}-GAIN_round)&gt;0.001)
+                fprintf(self.comPORT,[num2str(channel),<span class="string">':POSTGAIN = '</span>,<span class="keyword">...</span>
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+
+                <span class="keyword">if</span> abs(str2double(verify)- GAIN_round)&lt;0.001
+                    self.Postgain{channel} = GAIN_round;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: POSTGAIN'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>overload KSC<a name="14"></a></h2><pre class="codeinput">        <span class="keyword">function</span> [ovldIn1,ovldIn2,ovldOut1,ovldOut2] = ovldUpdate(self)
+        <span class="comment">% simple method to update the state of the overload</span>
+        <span class="comment">% returns: the overload state for all input and output channels</span>
+            self.OverloadIn{1} = query(self.comPORT, <span class="string">'1:INOVLD?'</span>,<span class="keyword">...</span>
+                <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadIn{2} = query(self.comPORT, <span class="string">'2:INOVLD?'</span>,<span class="keyword">...</span>
+                <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadOut{1} = query(self.comPORT, <span class="string">'1:OUTOVLD?'</span>,<span class="keyword">...</span>
+                <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            self.OverloadOut{2} = query(self.comPORT, <span class="string">'2:OUTOVLD?'</span>,<span class="keyword">...</span>
+                <span class="string">'%s\n'</span> ,<span class="string">'%s'</span>);
+            ovldIn1 = self.OverloadIn{1};
+            ovldIn2 = self.OverloadIn{2};
+            ovldOut1 = self.OverloadOut{1};
+            ovldOut2 = self.OverloadOut{2};
+        <span class="keyword">end</span>
+</pre><h2>ovldset KSC<a name="15"></a></h2><pre class="codeinput">        <span class="keyword">function</span> setOvldLim(self, channel, limit)
+        <span class="comment">% set the output voltage limit</span>
+        <span class="comment">% limit needs to be b/w 0.1 and 10.2</span>
+        <span class="comment">% if it is above 10.2 V it will be assigned the maximum value and</span>
+        <span class="comment">% if it is below 0.1 V it will be assigned the minimum value</span>
+            lim_round = round(limit/0.1)*0.1;
+            <span class="keyword">if</span> limit &gt; 10.2
+                lim_round = 10.2;
+            <span class="keyword">elseif</span> limit &lt; 0.1
+                lim_round = 0.1;
+            <span class="keyword">end</span>
+
+            <span class="comment">% set the limit</span>
+            <span class="comment">% only change if different</span>
+            <span class="keyword">if</span> (self.OverloadOutLimit{channel} ~= lim_round)
+                fprintf(self.comPORT,[num2str(channel),<span class="keyword">...</span>
+                    <span class="string">':OUTOVLDLIM = '</span>,num2str(lim_round)]);
+                verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> abs(str2double(verify)- lim_round)&lt;0.001
+                    self.OverloadOutLimit{channel} = lim_round;
+                    self.isUpdated = true;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: OVERLOAD SET'</span>);
+                <span class="keyword">end</span>
+
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>save KSC<a name="16"></a></h2><pre class="codeinput">        <span class="keyword">function</span> save(self)
+        <span class="comment">% save the state of the KSC-2 in non-volatile memory</span>
+
+            <span class="comment">% save current state</span>
+            <span class="comment">% only if it is updated</span>
+            <span class="keyword">if</span> self.isUpdated
+            fprintf(self.comPORT, [<span class="string">'SAVE'</span>]);
+            verify = (fscanf(self.comPORT, <span class="string">'%s'</span>));
+                <span class="keyword">if</span> strcmp(verify, <span class="string">'DONE'</span>)
+                    self.isUpdated = false;
+                <span class="keyword">else</span>
+                    error(<span class="string">'COMMUNICATION ERROR: CONFIGURATION NOT SAVED'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+</pre><h2>Static methods<a name="18"></a></h2><pre class="codeinput">    methods (Static)
+</pre><h2>Create array of KSC2 Objects<a name="19"></a></h2><pre class="codeinput">        <span class="keyword">function</span> arr = createArray(COM)
+            <span class="comment">% create a cell array of KSC2 objects</span>
+
+            <span class="keyword">if</span> (nargin == 0)
+                <span class="comment">% if no ports are given, assign them with findserial()</span>
+                COM = KSC2.findserial();
+            <span class="keyword">end</span>
+            <span class="comment">% preallocate cell array</span>
+            arr{length(COM)} = [];
+            <span class="keyword">for</span> i = 1:length(COM)
+                arr{i} = KSC2(COM{i});
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2>find serial ports<a name="20"></a></h2><pre class="codeinput">        <span class="keyword">function</span> ports = findserial()
+        <span class="comment">% returns cell array of found serial ports under Win</span>
+        <span class="comment">% uses CLI MODE command internally</span>
+            [~,res]=system(<span class="string">'mode'</span>);
+            <span class="comment">% regexp returns only the 'COM#' from the data returned from</span>
+            <span class="comment">%system</span>
+            ports=regexp(res,<span class="string">'COM\d+'</span>,<span class="string">'match'</span>); <span class="comment">% ports is an array of str</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Class for the KSC2
+% Standalone class. Includes API and error handling.
+% @author: Emmanuel Koumandakis (emmanuel@kulite.com)
+%
+% Based on the MATLAB API developed by Haig Norian and Adam Hurst
+
+
+classdef KSC2
+    
+    % most properties are Capitalized to comply with MATLAB Styling
+    % apart from SN, comPORT and isUpdated, all other 
+    % properties are cell arrays of length 2 (1 cell/channel)
+    properties (SetAccess = protected)
+        comPORT
+        SN
+        % object's current state is different than the saved state
+        isUpdated = false; 
+        Coupling 
+        ShieldMode
+        OperationMode
+        FilterType
+        FrequencyCutoff
+        Postgain
+        Pregain
+        ExcitationVoltage
+        ExcitationType
+        SenseMode
+        CompensationSwitch
+        ResonantFrequency
+        QualityFactor
+        OverloadIn
+        OverloadOut
+        OverloadOutLimit
+    end
+    
+    %% Methods
+    methods
+        
+        %%% Constructor
+        function self = KSC2(COM)
+            if (nargin == 0)
+                % if no ports are given, assign one with findserial()
+                COM = KSC2.findserial();
+            elseif (nargin > 1)
+                % Ideally every error should be implemented with custom
+                % exceptions like the one below, so that the user can do
+                % try-catch exception handling for specific exceptions
+                MEusage = MException('KCS2:incorrectUsage',...
+                    'Incorrect number of args.');
+                throw(MEusage)
+            end
+          
+            % Open port
+            self.comPORT = serial(COM, 'BaudRate', 57600, 'DataBits',...
+                8, 'Parity', 'none', 'StopBits', 1);
+            fopen(self.comPORT);
+
+            % Get settings and set attributes (also only block of code
+            % where the lines pass the 75 character limit ... )
+            self.SN = query(self.comPORT, ['SN?'], '%s\n' ,'%s');
+            self.Coupling{1} = query(self.comPORT, '1:COUPLING?', '%s\n' ,'%s');
+            self.Coupling{2} = query(self.comPORT, '2:COUPLING?', '%s\n' ,'%s');
+            self.ShieldMode{1} = query(self.comPORT, '1:SHIELD?', '%s\n' ,'%s');
+            self.ShieldMode{2} = query(self.comPORT, '2:SHIELD?', '%s\n' ,'%s');
+            self.OperationMode{1} = query(self.comPORT, '1:MODE?', '%s\n' ,'%s');
+            self.OperationMode{2} = query(self.comPORT, '2:MODE?', '%s\n' ,'%s');
+            self.FilterType{1} = query(self.comPORT, '1:FILTER?', '%s\n' ,'%s');
+            self.FilterType{2} = query(self.comPORT, '2:FILTER?', '%s\n' ,'%s');
+            self.FrequencyCutoff{1} = str2double(query(self.comPORT, '1:FC?', '%s\n' ,'%s'));
+            self.FrequencyCutoff{2} = str2double(query(self.comPORT, '2:FC?', '%s\n' ,'%s'));
+            self.Postgain{1} = str2double(query(self.comPORT, '1:POSTGAIN?', '%s\n' ,'%s'));
+            self.Postgain{2} = str2double(query(self.comPORT, '2:POSTGAIN?', '%s\n' ,'%s'));
+            self.Pregain{1} = str2double(query(self.comPORT, '1:PREGAIN?', '%s\n' ,'%s'));
+            self.Pregain{2} = str2double(query(self.comPORT, '2:PREGAIN?', '%s\n' ,'%s'));
+            self.ExcitationVoltage{1} = str2double(query(self.comPORT, '1:EXC?', '%s\n' ,'%s'));
+            self.ExcitationVoltage{2} = str2double(query(self.comPORT, '2:EXC?', '%s\n' ,'%s'));
+            self.ExcitationType{1} = query(self.comPORT, '1:EXCTYPE?', '%s\n' ,'%s');
+            self.ExcitationType{2} = query(self.comPORT, '2:EXCTYPE?', '%s\n' ,'%s');
+            self.SenseMode{1} = query(self.comPORT, '1:SENSE?', '%s\n' ,'%s');
+            self.SenseMode{2} = query(self.comPORT, '2:SENSE?', '%s\n' ,'%s');
+            self.CompensationSwitch{1} = query(self.comPORT, '1:COMPFILT?', '%s\n' ,'%s');
+            self.CompensationSwitch{2} = query(self.comPORT, '2:COMPFILT?', '%s\n' ,'%s');
+            self.ResonantFrequency{1} = str2double(query(self.comPORT, '1:COMPFILTFC?', '%s\n' ,'%s'));
+            self.ResonantFrequency{2} = str2double(query(self.comPORT, '2:COMPFILTFC?', '%s\n' ,'%s'));
+            self.QualityFactor{1} = str2double(query(self.comPORT, '1:COMPFILTQ?', '%s\n' ,'%s'));
+            self.QualityFactor{2} = str2double(query(self.comPORT, '2:COMPFILTQ?', '%s\n' ,'%s'));
+            self.OverloadIn{1} = query(self.comPORT, '1:INOVLD?', '%s\n' ,'%s');
+            self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?', '%s\n' ,'%s');
+            self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?', '%s\n' ,'%s');
+            self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?', '%s\n' ,'%s');
+            self.OverloadOutLimit{1} = str2double(query(self.comPORT, '1:OUTOVLDLIM?', '%s\n' ,'%s'));
+            self.OverloadOutLimit{2} = str2double(query(self.comPORT, '2:OUTOVLDLIM?', '%s\n' ,'%s'));
+        end
+        
+        
+        %%% Destructor
+        function delete(self)
+        % destructor method to take care of closing the file descriptor
+            fclose(self.comPORT);
+            delete(self.comPORT);
+            clear self
+        end
+        
+        function del(self); delete(self); end
+        % function to call delete faster (used 'del' in other languages)
+
+        %% Methods to set attributes + settings
+        
+        %%% configure KSC 
+        function configure(self, channel, coupling, shield, mode)
+        % change coupling, shield mode, and operation mode for each channel
+        %
+        % TODO: add available parameters
+            
+            coupling = upper(coupling);
+            shield = upper(shield);
+            mode = upper(mode);
+            
+            % set coupling (AC, DC)
+            % only change if different
+            if ~strcmp(self.Coupling{channel}, coupling) 
+                fprintf(self.comPORT, [num2str(channel), ':COUPLING = ',...
+                    coupling]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, coupling)
+                    self.isUpdated = true;
+                    self.Coupling{channel} = coupling;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: COUPLING');
+                end
+            end
+                
+            % set shield mode
+            % only change if different
+            if ~strcmp(self.ShieldMode{channel}, shield)
+                fprintf(self.comPORT,[num2str(channel),':SHIELD = ',...
+                    shield]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, shield)
+                    self.isUpdated = true;                        
+                    self.ShieldMode{channel} = shield;
+                else
+                    error('COMMUNICATION ERROR: MODE');
+                end
+
+            end
+
+
+            % set operation mode
+            % only change if different
+            if ~strcmp(self.OperationMode{channel}, mode)
+                fprintf(self.comPORT,[num2str(channel),':MODE = ',mode]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, mode)
+                    self.isUpdated = true;                        
+                    self.OperationMode{channel} = mode;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: SHIELD');
+                end
+            end
+        end
+        
+        %%% filter KSC
+        function filter(self, channel, freq_cut, type)
+        % change the filter type, cutoff frequency
+        %
+        % TODO: add available parameters
+            
+            % make uppercase
+            type = upper(type);
+            
+            % set FC
+            % only change if different
+            if ~strcmp(self.FrequencyCutoff{channel}, freq_cut)
+                fprintf(self.comPORT, [num2str(channel), ':FC = ',...
+                    num2str(freq_cut)]);
+                verify = (fscanf(self.comPORT, '%s'));
+
+                FC_round = round(freq_cut/500)*500;
+                if freq_cut<250
+                    FC_round = 500;
+                end
+
+                if str2double(verify) == FC_round
+                    self.FrequencyCutoff{channel} = FC_round;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: FC');
+                end
+            end
+
+            % set filter type
+            % only change if different
+            if ~strcmp(self.FilterType{channel}, type)
+                fprintf(self.comPORT,[num2str(channel),':FILTER = ',type]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, type)
+                    self.FilterType{channel} = type;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: FILTER TYPE');
+                end
+            end
+        end
+
+        
+        %%% excitation KSC
+        function excitation(self, channel, voltage, exc_type, sense)
+        % set the excitation voltage, type and sense mode
+        %
+        % TODO: add available parameters
+            
+            % make uppercase
+            exc_type = upper(exc_type);
+            sense = upper(sense);
+            
+            % set excitation voltage
+            % only change if different
+            V_round = round(voltage/0.00125)*0.00125;
+            if V_round ~= self.ExcitationVoltage{channel}
+                fprintf(self.comPORT, [num2str(channel), ':EXC = ',...
+                    num2str(voltage)]);
+                verify = (fscanf(self.comPORT, '%s'));
+
+                if str2double(verify) == V_round
+                    self.ExcitationVoltage{channel} = V_round;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: EXC');
+                end
+            end
+
+            % set excitation voltage type
+            % only change if different
+            if ~strcmp(self.ExcitationType{channel}, exc_type)
+                fprintf(self.comPORT, [num2str(channel), ':EXCTYPE = ',...
+                    exc_type]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, exc_type)
+                    self.ExcitationType{channel} = exc_type;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: EXCITATION TYPE');
+                end
+            end
+                
+            % set sense mode
+            % only change is different
+            if ~strcmp(self.SenseMode{channel}, sense)
+                fprintf(self.comPORT,[num2str(channel),':SENSE = ',sense]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if strcmp(verify, sense)
+                    self.SenseMode{channel} = sense;
+                    self.isUpdated = true;                
+                else
+                    error('COMMUNICATION ERROR: SENSE MODE');
+                end
+            end
+        end
+        
+        %%% cavitycompKSC 
+        function cavitycomp(self, channel, compfilt_onoff, varargin)
+        % takes the parameters to compensate for the Helmholtz resonance
+        % the resonant frequency and quality factor can only be modified
+        % when the REZCOMP filter is on
+        
+            % make uppercase
+            compfilt_onoff = upper(compfilt_onoff);
+            
+            if (length(varargin) > 2)
+                error('TOO MANY ARGUMENTS');
+            end
+            
+            if strcmp(compfilt_onoff, 'ON')
+                compfilt_fc = varargin{1};
+                compfilt_q = varargin{2};
+                
+                % set the switch
+                % only change if different
+                if ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
+                    verifyCC=query(self.comPORT,[num2str(channel),...
+                        ':COMPFILT = ',compfilt_onoff]);
+                    if strcmp(verifyCC, compfilt_onoff)
+                        self.CompensationSwitch{channel} = compfilt_onoff;
+                        self.isUpdated = true;
+                    else
+                        error('COMMUNICATION ERROR: COMPFILT');
+                    end
+                end
+                
+                % set the FC
+                % only change if different
+                if (self.ResonantFrequency{channel}~=compfilt_fc)
+                    verifyCCFC=query(self.comPORT,[num2str(channel),...
+                        ':COMPFILTFC = ',compfilt_fc]);
+                    if strcmp(verifyCCFC, compfilt_fc)
+                        self.ResonantFrequency{channel} = compfilt_fc;
+                        self.isUpdated = true;
+                    else
+                        error('COMMUNICATION ERROR: COMPFILTFC');
+                    end
+                end
+                
+                % set the Q
+                % only change if different
+                if (self.QualityFactor{channel}~=compfilt_q)
+                    verifyCCQ=query(self.comPORT,[num2str(channel),...
+                        ':COMPFILTQ = ',compfilt_q]);
+                    if strcmp(verifyCCQ, compfilt_q)
+                        self.QualityFactor{channel} = compfilt_q;
+                        self.isUpdated = true;
+                    else
+                        error('COMMUNICATION ERROR: COMPFILTQ');
+                    end
+                end
+                
+            elseif strcmp(compfilt_onoff, 'OFF') 
+            % in case it's OFF, don't care about FC and Q
+                if ~strcmp(self.CompensationSwitch{channel},compfilt_onoff)
+                    verifyCC=query(self.comPORT,[num2str(channel),...
+                        ':COMPFILT = ',compfilt_onoff]);
+                    if strcmp(verifyCC, compfilt_onoff)
+                        self.CompensationSwitch{channel} = compfilt_onoff;
+                        self.isUpdated = true;
+                    else
+                        error('COMMUNICATION ERROR: COMPFILT');
+                    end
+                end
+            end
+            
+        end
+
+        %%% pregain KSC        
+        function pregain(self, channel, gain)
+        % set the pregain (automatically sets any number to the closest
+        % power of 2)
+        % params: 
+        % channel: channel to be modified
+        % gain: the value for the pregain (max 128)
+        
+            % set gain
+            % only change if different
+            n = nextpow2(gain);
+            hi = 2^n;
+            lo = 2^(n-1);
+            if abs(hi-gain) <= abs(lo-gain)
+                GAIN_round = hi;
+            else
+                GAIN_round = lo;
+            end
+
+            if gain>128
+                GAIN_round = 128;
+            end
+            
+            if (abs(self.Pregain{channel}-GAIN_round)>0.001)
+                fprintf(self.comPORT, [num2str(channel), ':PREGAIN = ',...
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, '%s'));
+
+                if (abs(str2double(verify)- GAIN_round) < 0.001)
+                    self.Pregain{channel} = GAIN_round;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: PREGAIN');
+                end
+            end
+        end
+        
+        %%% postgain KSC
+        function postgain(self, channel, gain)
+        % set the postgain (max is 16)
+        % params: 
+        % channel: channel to be modified
+        % gain: the value for the postgain
+        
+            % set gain
+            % only change if different
+            GAIN_round = round(gain/0.0125)*0.0125;
+            if gain>16
+                GAIN_round = 16;
+            end
+            
+            if (abs(self.Postgain{channel}-GAIN_round)>0.001)
+                fprintf(self.comPORT,[num2str(channel),':POSTGAIN = ',...
+                    num2str(gain)]);
+                verify = (fscanf(self.comPORT, '%s'));
+
+                if abs(str2double(verify)- GAIN_round)<0.001
+                    self.Postgain{channel} = GAIN_round;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: POSTGAIN');
+                end
+            end
+        end
+        
+        %%% overload KSC
+        function [ovldIn1,ovldIn2,ovldOut1,ovldOut2] = ovldUpdate(self)
+        % simple method to update the state of the overload
+        % returns: the overload state for all input and output channels
+            self.OverloadIn{1} = query(self.comPORT, '1:INOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadIn{2} = query(self.comPORT, '2:INOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadOut{1} = query(self.comPORT, '1:OUTOVLD?',... 
+                '%s\n' ,'%s');
+            self.OverloadOut{2} = query(self.comPORT, '2:OUTOVLD?',... 
+                '%s\n' ,'%s'); 
+            ovldIn1 = self.OverloadIn{1};
+            ovldIn2 = self.OverloadIn{2};
+            ovldOut1 = self.OverloadOut{1};
+            ovldOut2 = self.OverloadOut{2};
+        end
+        
+        %%% ovldset KSC
+        function setOvldLim(self, channel, limit)
+        % set the output voltage limit
+        % limit needs to be b/w 0.1 and 10.2
+        % if it is above 10.2 V it will be assigned the maximum value and
+        % if it is below 0.1 V it will be assigned the minimum value
+            lim_round = round(limit/0.1)*0.1;
+            if limit > 10.2
+                lim_round = 10.2;
+            elseif limit < 0.1
+                lim_round = 0.1;
+            end
+            
+            % set the limit
+            % only change if different
+            if (self.OverloadOutLimit{channel} ~= lim_round)
+                fprintf(self.comPORT,[num2str(channel),...
+                    ':OUTOVLDLIM = ',num2str(lim_round)]);
+                verify = (fscanf(self.comPORT, '%s'));
+                if abs(str2double(verify)- lim_round)<0.001
+                    self.OverloadOutLimit{channel} = lim_round;
+                    self.isUpdated = true;
+                else
+                    error('COMMUNICATION ERROR: OVERLOAD SET');
+                end
+                
+            end
+        end
+        
+        %%% save KSC
+        function save(self)
+        % save the state of the KSC-2 in non-volatile memory
+        
+            % save current state
+            % only if it is updated
+            if self.isUpdated
+            fprintf(self.comPORT, ['SAVE']);
+            verify = (fscanf(self.comPORT, '%s'));    
+                if strcmp(verify, 'DONE')
+                    self.isUpdated = false;
+                else
+                    error('COMMUNICATION ERROR: CONFIGURATION NOT SAVED');
+                end
+            end
+        end
+    end
+    
+    %% Static methods
+    methods (Static)
+        
+        %%% Create array of KSC2 Objects
+        function arr = createArray(COM)
+            % create a cell array of KSC2 objects
+            
+            if (nargin == 0)
+                % if no ports are given, assign them with findserial()
+                COM = KSC2.findserial();
+            end
+            % preallocate cell array
+            arr{length(COM)} = [];
+            for i = 1:length(COM)
+                arr{i} = KSC2(COM{i});
+            end
+        end
+        
+        %%% find serial ports
+        function ports = findserial()
+        % returns cell array of found serial ports under Win
+        % uses CLI MODE command internally
+            [~,res]=system('mode'); 
+            % regexp returns only the 'COM#' from the data returned from 
+            %system
+            ports=regexp(res,'COM\d+','match'); % ports is an array of str
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>
